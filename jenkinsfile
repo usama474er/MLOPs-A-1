@@ -3,12 +3,10 @@ pipeline {
     stages {
         stage('Retrieve Dataset') {
             steps {
-                script {
-                    // Clone GitHub repository to retrieve dataset
-                    git clone https://github.com/usama474er/MLOPs-A-1.git
-                    // Print dataset files
-                    sh 'ls data'
-                }
+                // Clone GitHub repository to retrieve dataset
+                sh 'git clone https://github.com/usama474er/MLOPs-A-1.git'
+                // Print dataset files
+                sh 'ls data'
             }
         }
         stage('Build and Test') {
@@ -16,13 +14,22 @@ pipeline {
                 // Step 2: Build the project using Maven
                 sh 'mvn clean package'
                 // Step 3: Run tests (if applicable)
-                sh 'mvn test
+                sh 'mvn test'
             }
         }
         stage('Deploy') {
             steps {
+                // Step 4: Build and push Docker image
                 sh 'docker build -t dataset .'
                 sh 'docker push dataset'
+            }
+        }
+        stage('Notify Admin') {
+            steps {
+                // Send email notification to admin
+                emailext subject: 'Jenkins Job Successful - Deployment to Production',
+                          body: 'The Jenkins job for deployment to production branch was successful.',
+                          to: 'usamashafique474@gmail.com'
             }
         }
     }
